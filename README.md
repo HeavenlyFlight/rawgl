@@ -44,7 +44,7 @@ make install
  ```
 cd ~/rawgl
 make clean
-make -j8
+make
 ```
  - Run build_dist.sh (this copies the exe and dll to a /dist folder)
  ```
@@ -52,6 +52,7 @@ make -j8
 ./build_dist.sh
 ```
  - Añade los assets
+#
 
 ![Screenshot Intro Amiga](docs/screenshot-intro-amiga.png) ![Screenshot Intro 3DO](docs/screenshot-intro-3do.png)
 
