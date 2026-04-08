@@ -3,6 +3,56 @@
 
 rawgl is a re-implementation of the engine used in the game Another World.
 
+## Building for Windows
+
+ - Install MSYS2 https://www.msys2.org/
+ - Open MSYS2 MinGW UCRT64 (important)
+ ```
+pacman -Syu
+pacman -S --needed \
+    mingw-w64-ucrt-x86_64-gcc \
+    mingw-w64-ucrt-x86_64-cmake \
+    mingw-w64-ucrt-x86_64-make \
+    mingw-w64-ucrt-x86_64-SDL2 \
+    mingw-w64-ucrt-x86_64-SDL2_mixer \
+    mingw-w64-ucrt-x86_64-libogg \
+    mingw-w64-ucrt-x86_64-libvorbis \
+    mingw-w64-ucrt-x86_64-mpg123 \
+    mingw-w64-ucrt-x86_64-opusfile \
+    mingw-w64-ucrt-x86_64-flac \
+    mingw-w64-ucrt-x86_64-wavpack \
+    mingw-w64-ucrt-x86_64-libxmp
+```
+ - Build MT32Emu (static)
+ ```
+ cd munt/mt32emu
+rm -rf build
+mkdir build
+cd build
+
+cmake -G "Unix Makefiles" \
+  -DCMAKE_INSTALL_PREFIX=/ucrt64 \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DCMAKE_C_COMPILER=/ucrt64/bin/gcc \
+  -DCMAKE_CXX_COMPILER=/ucrt64/bin/g++ \
+  ..
+
+make -j0
+make install
+```
+ - Build RawGl
+ ```
+cd ~/rawgl
+make clean
+make -j8
+```
+ - Run build_dist.sh (this copies the exe and dll to a /dist folder)
+ ```
+ chmod +x build_dist.sh
+./build_dist.sh
+```
+ - Añade los assets
+
 ![Screenshot Intro Amiga](docs/screenshot-intro-amiga.png) ![Screenshot Intro 3DO](docs/screenshot-intro-3do.png)
 
 ## Supported Versions

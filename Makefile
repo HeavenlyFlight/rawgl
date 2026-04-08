@@ -1,41 +1,64 @@
+# -----------------------------
+#  RAWGL - Windows (MSYS2 UCRT64)
+# -----------------------------
 
 SRCS = aifcplayer.cpp bitmap.cpp file.cpp engine.cpp graphics_soft.cpp \
-	script.cpp mixer.cpp pak.cpp resource.cpp resource_mac.cpp resource_nth.cpp \
-	resource_win31.cpp resource_3do.cpp scaler.cpp screenshot.cpp systemstub_sdl.cpp sfxplayer.cpp \
-	staticres.cpp unpack.cpp util.cpp video.cpp main.cpp
+       script.cpp mixer.cpp pak.cpp resource.cpp resource_mac.cpp resource_nth.cpp \
+       resource_win31.cpp resource_3do.cpp scaler.cpp screenshot.cpp systemstub_sdl.cpp \
+       sfxplayer.cpp staticres.cpp unpack.cpp util.cpp video.cpp main.cpp
 
-SDL_CFLAGS = `sdl2-config --cflags`
-SDL_LIBS = `sdl2-config --libs` -lSDL2_mixer
+# SDL2 flags
+SDL_CFLAGS = $(shell sdl2-config --cflags)
+SDL_LIBS   = $(shell sdl2-config --libs) -lSDL2_mixer
 
-DEFINES = -DBYPASS_PROTECTION
-
+# Enable OpenGL on Windows
 ifndef NO_GL
 	SRCS += graphics_gl.cpp
-	SDL_LIBS += -lGL
+	SDL_LIBS += -lopengl32
 	DEFINES += -DUSE_GL
 endif
 
-CXXFLAGS := -g -O -MMD -Wall -Wpedantic $(SDL_CFLAGS) $(DEFINES)
-LIBS := -lz
+# MT32Emu support
 ifndef NO_MT32EMU
-	CXXFLAGS += -DUSE_MT32EMU
+	DEFINES += -DUSE_MT32EMU
 	LIBS += -lmt32emu
 endif
+
+# Optional ADLMIDI
 ifdef USE_LIBADLMIDI
-	CXXFLAGS += -DUSE_LIBADLMIDI
+	DEFINES += -DUSE_LIBADLMIDI
 	LIBS += -lADLMIDI
 endif
-ifeq "$(TARGET)" "pyra"
-	CXXFLAGS += -O3 -DPYRA -march=armv7ve+simd -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard -mthumb
-endif
+
+# Compiler flags
+CXXFLAGS := -g -O2 -MMD -Wall -Wpedantic $(SDL_CFLAGS) $(DEFINES)
+CXXFLAGS += -static-libgcc -static-libstdc++
+
+
+# Linker flags
+LIBS += -lz
 
 OBJS = $(SRCS:.cpp=.o)
 DEPS = $(SRCS:.cpp=.d)
 
+# -----------------------------
+#  Build target
+# -----------------------------
 rawgl: $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(SDL_LIBS) $(LIBS)
+	$(CXX) -static-libgcc -static-libstdc++ \
+        -o $@ $(OBJS) \
+        -lmingw32 -mwindows \
+        -lSDL2main -lSDL2 -lSDL2_mixer \
+        -lopengl32 \
+        /ucrt64/lib/libmt32emu.a \
+        /ucrt64/lib/libz.a
 
+
+# -----------------------------
+#  Clean
+# -----------------------------
 clean:
-	rm -f $(OBJS) $(DEPS)
+	rm -f $(OBJS) $(DEPS) rawgl.exe rawgl
 
 -include $(DEPS)
+
