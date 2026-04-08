@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 DIST="dist"
@@ -33,6 +32,32 @@ cp "$UCRT/libxmp.dll" "$DIST/"
 echo "Copying MinGW runtime..."
 cp "$UCRT/libwinpthread-1.dll" "$DIST/"
 
+echo "Copying game assets (if present)..."
+for folder in \
+    Amiga \
+    Atari \
+    "Atari demo" \
+    DOS \
+    "DOS demo" \
+    "15th Anniversary Edition" \
+    "20th Anniversary Edition" \
+    "Windows 3.1" \
+    3DO \
+    Macintosh \
+    Bank* \
+    Demo* \
+    Data \
+    Menu \
+    Music \
+    game \
+    GameData \
+    data
+do
+    if [ -e "$folder" ]; then
+        echo "  -> copying $folder"
+        cp -r "$folder" "$DIST/"
+    fi
+done
+
 echo "Done!"
 echo "Your game is ready in: $DIST/"
-
